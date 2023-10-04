@@ -23,16 +23,17 @@ func main() {
 	var perscListSuccess []Prescription
 
 	for _, persc := range perscList {
-		res, err := helpers.PrescriptionAirdrop(
+		txhex, err := helpers.PrescriptionAirdrop(
 			persc.OwnerAddress,
-			"e027531de98a7ee6830a45d78e8f2ae873640342fab9190365fb0a27d57ac69a",
-			"L2fgiaz4bpCdvbHvvTgeG4gHC15QFdbwMbwsoyQNTwGVJK4Uido6",
-			"KwPVoki5qyur6JwotJkNXsEEENf46VmtHbMnLESatNoeVhZ1NEGp",
+			"e027531de98a7ee6830a45d78e8f2ae873640342fab9190365fb0a27d57ac69a", // inscUTXO
+			"L2fgiaz4bpCdvbHvvTgeG4gHC15QFdbwMbwsoyQNTwGVJK4Uido6",             // inscWIF
+			"KwPVoki5qyur6JwotJkNXsEEENf46VmtHbMnLESatNoeVhZ1NEGp",             // fundingWIF
 			client,
 		)
-		fmt.Println(res)
+		fmt.Println(txhex)
 
 		if err == nil {
+			persc.AirDropTx = &txhex
 			perscListSuccess = append(perscListSuccess, persc)
 			fmt.Println("Success airdropping:")
 			fmt.Println(persc)
@@ -76,6 +77,7 @@ type Prescription struct {
 	Seller       *string `json:"seller,omitempty"`
 	OwnerAddress string  `json:"ownerAddress"`
 	Paymail      string  `json:"paymail"`
+	AirDropTx    *string `json:"airdropTx,omitempty"`
 }
 
 func readFile(filename string) ([]Prescription, error) {
