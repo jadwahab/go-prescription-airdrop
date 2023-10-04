@@ -22,8 +22,8 @@ func main() {
 
 	var perscListSuccess []Prescription
 
-	for _, persc := range perscList {
-		txhex, err := helpers.PrescriptionAirdrop(
+	for _, persc := range perscList[:5] {
+		txhex, txid, err := helpers.PrescriptionAirdrop(
 			persc.OwnerAddress,
 			"e027531de98a7ee6830a45d78e8f2ae873640342fab9190365fb0a27d57ac69a", // inscUTXO
 			"L2fgiaz4bpCdvbHvvTgeG4gHC15QFdbwMbwsoyQNTwGVJK4Uido6",             // inscWIF
@@ -33,38 +33,44 @@ func main() {
 		fmt.Println(txhex)
 
 		if err == nil {
+			persc.AirDropTxId = &txid
 			persc.AirDropTx = &txhex
 			perscListSuccess = append(perscListSuccess, persc)
 			fmt.Println("Success airdropping:")
 			fmt.Println(persc)
+			fmt.Println()
 
 			delay(100)
 		} else {
+			fmt.Printf("Failed to airdrop prescription #%d\n", persc.PropsNo)
 			fmt.Println(err)
 		}
 	}
 
 	// Filter out the successful ones from the original array
-	for i, persc := range perscList {
+	var remainingPerscList []Prescription
+	for _, persc := range perscList {
+		found := false
 		for _, successPersc := range perscListSuccess {
-			if persc == successPersc {
-				perscList = append(perscList[:i], perscList[i+1:]...)
+			if persc.PropsNo == successPersc.PropsNo {
+				found = true
 				break
 			}
 		}
+		if !found {
+			remainingPerscList = append(remainingPerscList, persc)
+		}
 	}
 
-	fmt.Println("Successful List:")
-	fmt.Println(perscListSuccess)
-	fmt.Println("Remaining List:")
-	fmt.Println(perscList)
+	fmt.Printf("Successfully airdropped %d items\n", len(perscListSuccess))
+	fmt.Printf("%d items remaining\n", len(perscList))
 
 	// Write perscListSuccess and perscList to separate files
-	if err := writeToFile("perscListSuccess", perscListSuccess); err != nil {
+	if err := writeToFile("perscListSuccess.json", perscListSuccess); err != nil {
 		fmt.Println("Error writing to success file:", err)
 	}
 
-	if err := writeToFile("perscList", perscList); err != nil {
+	if err := writeToFile("perscList.json", remainingPerscList); err != nil {
 		fmt.Println("Error writing to remaining file:", err)
 	}
 }
@@ -77,6 +83,7 @@ type Prescription struct {
 	Seller       *string `json:"seller,omitempty"`
 	OwnerAddress string  `json:"ownerAddress"`
 	Paymail      string  `json:"paymail"`
+	AirDropTxId  *string `json:"airdropTxId,omitempty"`
 	AirDropTx    *string `json:"airdropTx,omitempty"`
 }
 

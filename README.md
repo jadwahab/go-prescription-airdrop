@@ -12,23 +12,28 @@ This Go application reads a JSON file containing a list of prescriptions, perfor
 
 Clone the repository:
 
-\`\`\`bash
+```bash
 git clone https://github.com/yourusername/go-prescription-airdrop.git
-\`\`\`
+```
 
 Navigate to the project directory:
 
-\`\`\`bash
+```bash
 cd go-prescription-airdrop
-\`\`\`
+```
 
 ## Usage
 
 To run the program, execute:
 
-\`\`\`bash
+```bash
 go run main.go
-\`\`\`
+```
+
+If you want to only run a few at a time (for example only 100) instead of all 5000 or so, just change line 25 in main.go to
+```go
+	for _, persc := range perscList[:100] {
+```
 
 ## Output
 
