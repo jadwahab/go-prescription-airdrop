@@ -60,9 +60,11 @@ func PrescriptionAirdrop(perscOwnerAddress, inscTxId, inscWIF, fundingWIF string
 		return "", "", err
 	}
 
+	vin := uint32(utxos[0].TxPos)
+
 	err = bsvTx.From(utxos[0].TxHash,
-		0,
-		utxoTxInfo.Vout[0].ScriptPubKey.Hex,
+		vin,
+		utxoTxInfo.Vout[vin].ScriptPubKey.Hex,
 		uint64(utxos[0].Value))
 	if err != nil {
 		return "", "", err
