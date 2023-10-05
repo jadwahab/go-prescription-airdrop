@@ -51,6 +51,10 @@ func PrescriptionAirdrop(perscOwnerAddress, inscTxId, inscWIF, fundingWIF string
 		return "", "", err
 	}
 
+	if len(utxos) < 1 {
+		return "", "", errors.New("no UTXOs to use for funding")
+	}
+
 	utxoTxInfo, err := c.GetTxByHash(context.Background(), utxos[0].TxHash)
 	if err != nil {
 		return "", "", err
